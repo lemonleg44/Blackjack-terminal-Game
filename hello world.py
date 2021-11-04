@@ -19,6 +19,80 @@ def intcheck(vari):
     except :
         return False 
 
+class player :
+    
+    def __init__(self) -> None:
+        self.hand = []
+    def blackjack(self):
+        total = 0
+        for card in self.hand:
+            total += card.val
+        if total == 21:
+            return True
+        else:
+            return False
+    def deal(self):
+        self.hand.append(cardpicker(deckofcards))
+        self.hand.append(cardpicker(deckofcards))
+        
+    def hit(self):
+        self.hand.append(cardpicker(deckofcards))
+        
+
+    def showhand(self):
+        print("PLayers Cards:")
+        for card in self.hand:
+            print (card.displayname())
+    def calchand(self):
+        total_val = 0
+        a_counter = 0
+        for card in self.hand :
+            if card.val == 11:
+                a_counter += 1
+            total_val +=  card.val
+        while a_counter != 0  and total_val> 21:
+            a_counter -= 1
+            total_val -= 10
+        if total_val <= 21:
+            return(True, total_val) 
+        else:
+            return (False, total_val)
+        
+
+        
+class dealer(player):
+    def __init__(self) -> None:
+        super().__init__()
+    def showone(self):
+        print("Dealers Faceup Card")
+        print(self.hand[0].displayname())
+    def soft17(self):
+        total = 0
+        a_counter = 0
+        for card in self.hand:
+            if card.val == 11:
+                a_counter +=1
+            total += card.val
+        if total == 17 and a_counter == 1:
+            return True
+        else:
+            return False
+    def dealershowhand(self):
+        print("Dealers Cards:")
+        for card in self.hand:
+            print (card.displayname())
+
+    def dealerai(self):
+        
+        if self.soft17() == True:
+            self.hit()
+            while self.calchand()[1] < 18:
+                self.hit()
+        else:
+            while self.calchand()[1] < 17:
+                self.hit()
+        
+         
 
 c1 = card("Ace" , 11 , "Diamond")# creating cards
 c2 = card("Ace" , 11 , "Clover")
@@ -79,7 +153,7 @@ print("++++++++++++++++++++++++++++++++++++++")
 print("Welcome To Jun Shengs Blackjack Casino")
 print("Blackjack Pays 3 to 2")
 print("Dealer hits on soft 17")
-print("Insurance pays 2 to 1")
+
 print("++++++++++++++++++++++++++++++++++++++")
 
 capital = input("How much would you like to cash in?  ")
@@ -102,6 +176,71 @@ while True:# start of new game
             else:
                 print("bet bigger than capital please input correct bet ")
         bet_amount = input("Please Place your bet  ")
-        
+    bet_amount = int(bet_amount)
+    dealer1 = dealer()
+    player1 = player()  
+    player1.deal()
+    dealer1.deal()
+    dealer1.showone()
+    player1.showhand()
+    if player1.blackjack() == True and dealer1.blackjack() == False:
+        print("you Blackjacked!")
+        print("you win!")
+        value_won = bet_amount * 1.5
+        capital += value_won
+        print("your new capital is {}".format(str(capital)))
+        break #game end
+    elif player1.blackjack() == False and dealer1.blackjack() == True:
+        capital -= bet_amount
+        print("dealer Blackjack")
+        print("you lost better luck next time!")
+        print("your new capital is {}".format(str(capital)))
+        break # game end
+    elif player1.blackjack() == True and dealer1.blackjack() == True:
+        print("bet is pushed")
+        print("your new capital is {}".format(str(capital)))
+        break #game end
+    bust = False
+    while True and bust == False:
+        sorh = input("stand or hit press 1 to stand 2 to hit:   ")
+        if sorh == "1":
+            print("++++++++++++++")
+            player1.showhand()
+            print("your hand value is {}".format(str(player1.calchand()[1])))
+            print("+++++++++++++++++")
+            break
+        else:
+            player1.hit()
+            player1.showhand()
+            if player1.calchand()[0] == False:
+                
+                capital -= bet_amount
+                bust = True
+    print("------------------------")
+    
+    print("your hand value is {}".format(str(player1.calchand()[1])))
+    dealer1.dealerai()
+    print("--------------------------")
+    dealer1.dealershowhand()
+    print("dealers hand value is {}".format(str(dealer1.calchand()[1])))
+    if player1.calchand()[1] > 21:
+        print ("bust lah u greedy bastard")
+        print("your new capital is {}".format(str(capital)))
+        break #game end
 
-    break
+    elif dealer1.calchand()[0] == False or dealer1.calchand()[1] < player1.calchand()[1]:
+        capital += bet_amount
+        print("You won!")
+        print("your new capital is {}".format(str(capital)))
+        break #game end
+    elif  dealer1.calchand()[1] == player1.calchand()[1]:
+        print("bet is pushed")
+        print("your new capital is {}".format(str(capital)))
+        break # gameend
+    else:
+        capital -= bet_amount
+        print("you lost better luck next time!")
+        print("your new capital is {}".format(str(capital)))
+        break 
+        
+    
